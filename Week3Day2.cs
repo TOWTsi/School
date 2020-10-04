@@ -1,20 +1,171 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 
-namespace Week3Day2
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            var random = new Random();
-            Console.WriteLine($"Random Number = {random.Next(-1, 2)}");
+namespace Week3Day2 {
+    class Program {
+        static void Main(string[] args) {
+            //PositionsOfHorizontalRoutes(5, 5, true , 0);
+            PositionsOfHorizontalRoutes(50, 25, true, 1);
+            PositionsOfHorizontalRoutes(50, 25, true, 2);
+            PositionsOfHorizontalRoutes(50, 25, true, 3);
+            PositionsOfHorizontalRoutes(5, 5, true, 1);
+            PositionsOfHorizontalRoutes(5, 5, true, 2);
+            PositionsOfHorizontalRoutes(5, 5, true, 3);
+            PositionsOfHorizontalRoutes(50, 25, false, 1);
+            PositionsOfHorizontalRoutes(50, 25, false, 2);
+            PositionsOfHorizontalRoutes(50, 25, false, 3);
+            PositionsOfVerticalRoutes(50, 25, true, 1);
+            PositionsOfVerticalRoutes(50, 25, true, 2);
+            PositionsOfVerticalRoutes(50, 25, true, 3);
+            PositionsOfVerticalRoutes(50, 25, false, 1);
+            PositionsOfVerticalRoutes(50, 25, false, 2);
+            PositionsOfVerticalRoutes(50, 25, false, 3);
+
+            DrawMap(5, 5);
         }
-        // Week 3 Day 2 Mission 1: BOSS LEVEL Adventure map Part 1
+        // Week 3 Day 2 Mission 1: BOSS LEVEL Adventure map Part 2
         static void DrawMap(int width, int height) {
             var random = new Random();
-            Console.WriteLine($"Random Number = {random.Next(-1,2)}");
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    // Draw frame
+                    if ((x == 0 && y == 0) || (x == 0 && y == height - 1)) {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("+");
+                    } else if ((x == width - 1 && y == 0) || (x == width - 1 && y == height - 1)) {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("+");
+                    } else if ((x > 0) && (y == 0 || y == height - 1)) {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("-");
+                    } else if ((x == 0 || x == width - 1) && (y > 0)) {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("|");
+                    } else {
+                        // We are in the map
+                        int frameWidthPerRow = 2;
+                        int ratioOfTheForest = 3; // its calculated 1/ratioOfTheForest
+                        int forestArea = (width - frameWidthPerRow) / ratioOfTheForest;
+                        if (x <= forestArea) {
+                            int isTreePlaced = random.Next(0, x);
+                            if (isTreePlaced < 1) {
+                                Console.Write(GenerateTree());
+                            } else {
+                                Console.Write(" ");
+                            }
+                        } else {
+                            Console.Write(" ");
+                        }
+
+                    }
+                }
+
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.White;
+            }
         }
 
+        static string GenerateTree() {
+            var random = new Random();
+            List<string> treeCharacters = new List<string> { "A", "T", "@", "%", "(", ")" };
+            int randomCharacter = random.Next(0, treeCharacters.Count);
+            List<ConsoleColor> possibleTreeColors = new List<ConsoleColor> { ConsoleColor.Green, ConsoleColor.DarkGreen };
+            int randomColor = random.Next(0, possibleTreeColors.Count);
+            Console.ForegroundColor = possibleTreeColors[randomColor];
+            return treeCharacters[randomCharacter];
+        }
+
+        // Week 3 Day 3 Mission 3: BOSS LEVEL Adventure map Part 3
+
+        // Choose a random startpoint of the road in the left middle side of the map(2x1)
+        static string PositionsOfHorizontalRoutes(int width, int height, bool start = true, int positionInRatio = 2, int ratio = 3) {
+            const int CORRECTIONOFBORDERS = 1;
+            const int CORRECTIONOFRATIO = 1;
+            int heightRange = (height / ratio);
+            Random random = new Random();
+            if (positionInRatio >= ratio) {
+                heightRange = random.Next(heightRange * (ratio - CORRECTIONOFRATIO), height - CORRECTIONOFBORDERS);
+            } else if (positionInRatio <= 1) {
+                heightRange = random.Next(CORRECTIONOFBORDERS, heightRange * positionInRatio + CORRECTIONOFBORDERS);
+            } else {
+                heightRange = random.Next(heightRange * (positionInRatio - CORRECTIONOFRATIO) + CORRECTIONOFBORDERS, heightRange * positionInRatio + CORRECTIONOFBORDERS);
+            }
+            string result = "";
+            if (start) {
+                result = $"({CORRECTIONOFBORDERS},{heightRange})";
+            } else {
+                result = $"({width - CORRECTIONOFBORDERS - CORRECTIONOFBORDERS},{heightRange})";
+            }
+            Console.WriteLine(result);
+            return result;
+        }
+
+
+        // Choose a random startpoint of the river on the right side of the map (1x3)
+        static string PositionsOfVerticalRoutes(int width, int height, bool start = true, int positionInRatio = 2, int ratio = 3) {
+            const int CORRECTIONOFBORDERS = 1;
+            const int CORRECTIONOFRATIO = 1;
+            int widthRange = (width / ratio);
+            Random random = new Random();
+            if (positionInRatio >= ratio) {
+                widthRange = random.Next(widthRange * (ratio - CORRECTIONOFRATIO), width - CORRECTIONOFRATIO);
+            } else if (positionInRatio <= 1) {
+                widthRange = random.Next(CORRECTIONOFBORDERS, widthRange * positionInRatio + CORRECTIONOFBORDERS);
+            } else {
+                widthRange = random.Next(widthRange * (positionInRatio - CORRECTIONOFRATIO) + CORRECTIONOFBORDERS, widthRange * positionInRatio + CORRECTIONOFBORDERS);
+            }
+            string result = "";
+            if (start) {
+                result = $"({widthRange},{CORRECTIONOFBORDERS})";
+            } else {
+                result = $"({widthRange},{height - CORRECTIONOFBORDERS - CORRECTIONOFBORDERS})";
+            }
+            Console.WriteLine(result);
+            return result;
+        }
+
+        // Choose a random startpoint of the road in the right middle of the map (2x2)
+        static string StartPositionIntersection(int width, int height) {
+            string result = "";
+
+            return result;
+        }
+
+        static string StartPositionBridge(int width, int height) {
+            string result = "";
+
+            return result;
+        }
+
+        static string EndPositionBridge(int width, int height) {
+            string result = "";
+
+            return result;
+        }
+
+        static string CenterTopPositionBridge(int width, int height) {
+            string result = "";
+
+            return result;
+        }
+
+        static string CenterBottomPositionBridge(int width, int height) {
+            string result = "";
+
+            return result;
+        }
+
+        static List<string> GenerateBridge(int width, int height) {
+            List<string> result = new List<string>();
+
+            return result;
+        }
+
+
+
+
+
+        // Week 3 Day 2 Mission 1: BOSS LEVEL Adventure map Part 1
         /*
          * 1. List of Elements:
          * A frame for the Map
